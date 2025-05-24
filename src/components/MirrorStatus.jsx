@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../utils/axiosInstance';
 
 export default function MirrorStatus() {
   const [mirrorState, setMirrorState] = useState(null);
@@ -7,7 +7,7 @@ export default function MirrorStatus() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get('/mirror')
+    axios.get('/mirror/status')
       .then(res => setMirrorState(res.data))
       .catch(err => setError('Failed to load mirror state.'))
       .finally(() => setLoading(false));
