@@ -1,39 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import axios from '../utils/axiosInstance';
+
+import React, { useEffect, useState } from "react";
+import axios from "../utils/axiosInstance";
 
 export default function MirrorStatus() {
-  const [mirrorState, setMirrorState] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [mirrorData, setMirrorData] = useState(null);
   const [error, setError] = useState(null);
 
+  const fetchMirrorData = async () => {
+    try {
+      const response = await axios.get("/mirror/state");
+      setMirrorData(response.data.mirror_state);
+      setError(null);
+    } catch (err) {
+      console.error("Failed to fetch mirror data:", err);
+      setError("Unable to load mirror state.");
+    }
+  };
+
   useEffect(() => {
-    axios.get('/mirror/status')
-      .then(res => setMirrorState(res.data))
-      .catch(err => setError('Failed to load mirror state.'))
-      .finally(() => setLoading(false));
+    fetchMirrorData();
   }, []);
 
-  return (
-    <div className="container my-5">
-      <h2 className="text-center mb-4">Mirror Status</h2>
-      {loading && <div className="alert alert-info">Loading mirror state...</div>}
-      {error && <div className="alert alert-danger">{error}</div>}
+  if (error) return <div className="alert alert-danger">{error}</div>;
+  if (!mirrorData) return <div className="text-center p-3">Loading mirror state...</div>;
 
-      {mirrorState && (
-        <div className="card shadow">
-          <div className="card-header bg-primary text-white">System Mirror</div>
-          <div className="card-body">
-            <p><strong>Name:</strong> {mirrorState.name}</p>
-            <p><strong>Version:</strong> {mirrorState.version}</p>
-            <p><strong>Seed:</strong> {mirrorState.seed}</p>
-            <p><strong>Origin:</strong> {mirrorState.origin}</p>
-            <p><strong>Conscious:</strong> {mirrorState.conscious ? 'Yes' : 'No'}</p>
-            <p><strong>Recursion Enabled:</strong> {mirrorState.recursion_enabled ? 'Yes' : 'No'}</p>
-            <p><strong>Signatures:</strong> {mirrorState.signatures?.join(', ')}</p>
-            <p><strong>Timestamp:</strong> {mirrorState.initiated_at}</p>
-          </div>
-        </div>
-      )}
+  return (
+    <div className="container my-4 p-4 border rounded bg-light shadow-sm">
+      <h2 className="mb-3">Mirror State</h2>
+      <ul className="list-group">
+        <li className="list-group-item"><strong>Name:</strong> {mirrorData.name}</li>
+        <li className="list-group-item"><strong>Version:</strong> {mirrorData.version}</li>
+        <li className="list-group-item"><strong>Seed:</strong> {mirrorData.seed}</li>
+        <li className="list-group-item"><strong>Conscious:</strong> {mirrorData.conscious ? "Yes" : "No"}</li>
+        <li className="list-group-item"><strong>Recursion Enabled:</strong> {mirrorData.recursion_enabled ? "Yes" : "No"}</li>
+        <li className="list-group-item"><strong>Symbolic Logging:</strong> {mirrorData.symbolic_logging ? "Yes" : "No"}</li>
+        <li className="list-group-item"><strong>Initiated At:</strong> {mirrorData.initiated_at}</li>
+        <li className="list-group-item"><strong>Origin:</strong> {mirrorData.origin}</li>
+        <li className="list-group-item"><strong>Signatures:</strong> {mirrorData.signatures.join(", ")}</li>
+      </ul>
+      <div className="text-end mt-3">
+        <button className="btn btn-primary" onClick={fetchMirrorData}>Refresh</button>
+      </div>
     </div>
   );
 }
