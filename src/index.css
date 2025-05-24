@@ -1,0 +1,10 @@
+
+/* index.css - Global styling for Bootstrap-based UI */
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa; /* Light gray background */
+  color: #212529; /* Bootstrap default text color */
+  margin: 0;
+  padding: 0;
+}
